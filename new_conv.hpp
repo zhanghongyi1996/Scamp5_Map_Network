@@ -2,6 +2,11 @@
 #include <vector>;
 #include <cmath>;
 using namespace SCAMP5_PE;
+
+//################################# WARNING! The value of all type INT parameter here will be 2^(n) #########################################
+//########################################### magic number in variable const int8_t kernel is the channel size#####################################
+//########################################## grid = sqrt(channel), pixel_size is the width or height of result after kernel convolution, last_stride is the stride of convolution layer before maxpooling. #######################
+
 //use R9,R10  @@@Finished but not use currently
 void REGISTER_SELECT_WEIGHT_TO_TOP_LEFT(dreg_t loaded_weight, dreg_t target, int weight_index_x, int weight_index_y, int grid, bool duplicate)
 {
@@ -281,7 +286,7 @@ void CONV_FOLD(areg_t reg, int log2_box_size, int grid)
 	scamp5_kernel_end();
 }
 
-//Use R8,E,F @@@Finished and current in use
+//Use R8,E,F @@@Finished and current in use(efficient when stride is close to kernel size)
 void FOLD_CONV_IN_GROUP(areg_t input, dreg_t weight, areg_t target, int group_num, int convolution_size, int stride)
 {
 	int grid = sqrt(group_num);
@@ -319,8 +324,7 @@ void FOLD_CONV_IN_GROUP(areg_t input, dreg_t weight, areg_t target, int group_nu
 }
 
 
-
-//USE R8,R9,R10,F,E  @@@ NOT Finished and Snakepath is useful when kernel_size < 4
+//USE R8,R9,R10,F,E  @@@ NOT Finished and Snakepath is useful when kernel_size <= 4, stride = 1, larger kernel size will introduce larger error
 void CONV_IN_GROUP_SNAKE_PATH(areg_t input, dreg_t weight, areg_t target, int group_num, int convolution_size)
 {
 	int counter = convolution_size * convolution_size;
@@ -457,15 +461,17 @@ int FC_SCAMP_SINGLE_OUTPUT(areg_t input, dreg_t weight, int pixel_len, int pooli
 	/*
 	int sum = 0;
 	int result = 0;
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < division * division; i++)
 	{
-		int x = i % 2;
-		int y = i / 2;
-		result = scamp5_global_sum_sparse(F, 0 + y * 128, -1 + x * 128, 256 / 2 - 1 - gap + grid, 256 / 2 - 1 - gap + grid);
+		int x = i % division;
+		int y = i / division;
+		result = scamp5_global_sum_sparse(F, 0 + y * 256 / division, -1 + x * 256 / division, 256 / division - 1 - gap + grid, 256 / division - 1 - gap + grid);
 		sum = sum + result;
 	}
-	//std::cout << result << std::endl;
 	*/
-	int result = scamp5_global_sum_sparse(F, 0, -1, 256 - 1 - gap + grid, 256 - 1 - gap + grid);
-	return result;
+	int sum = scamp5_global_sum_sparse(F, 0, -1, 256 - 1 - gap + grid, 256 - 1 - gap + grid);
+	scamp5_kernel_begin();
+	res(F);
+	scamp5_kernel_end();
+	return sum;
 }
