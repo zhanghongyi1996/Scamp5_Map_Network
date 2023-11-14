@@ -2,7 +2,7 @@
 #include <vector>;
 #include <cmath>;
 using namespace SCAMP5_PE;
-//use R9,R10
+//use R9,R10  @@@Finished but not use currently
 void REGISTER_SELECT_WEIGHT_TO_TOP_LEFT(dreg_t loaded_weight, dreg_t target, int weight_index_x, int weight_index_y, int grid, bool duplicate)
 {
 	scamp5_load_rect(target, weight_index_y * grid, 255 - grid * (weight_index_x + 1) + 1, (weight_index_y + 1) * grid - 1, 255 - grid * weight_index_x);
@@ -42,7 +42,7 @@ void REGISTER_SELECT_WEIGHT_TO_TOP_LEFT(dreg_t loaded_weight, dreg_t target, int
 	}
 }
 
-
+// @@@Finished but not use currently
 void REGISTER_WEIGHT_IN_GROUP_WITHOUT_DUPLICATE(dreg_t weight_target, const int8_t kernel[][1][16], int grid, int convolution_size)
 {
 	scamp5_draw_begin(weight_target);
@@ -65,7 +65,7 @@ void REGISTER_WEIGHT_IN_GROUP_WITHOUT_DUPLICATE(dreg_t weight_target, const int8
 	scamp5_draw_end();
 }
 
-//use R10, R8, R9, R3
+//use R10, R8, R9, R3  @@@Finished and current in use
 void REGISTER_IMAGE_IN_GROUP(areg_t input, int grid)
 {
 	scamp5_load_pattern(R8, 0, -1, 255 - grid + 1, 255 - grid + 1);
@@ -127,7 +127,7 @@ void REGISTER_IMAGE_IN_GROUP(areg_t input, int grid)
 	scamp5_dynamic_kernel_end();
 }
 
-//use R8, R9, R3
+//use R8, R9, R3 @@@Finished and current in use
 void REGISTER_WEIGHT_IN_GROUP(dreg_t weight_target, const int8_t kernel[][1][16], int grid, int convolution_size)
 {
 	scamp5_draw_begin(weight_target);
@@ -180,7 +180,7 @@ void REGISTER_WEIGHT_IN_GROUP(dreg_t weight_target, const int8_t kernel[][1][16]
 	scamp5_kernel_end();
 }
 
-
+// @@@Finished and current in use
 void REGISTER_FC_WEIGHT(dreg_t weight_target, const int8_t kernel[][1024], int grid, int pixel_size, int output_size)
 {
 	int num_neuron_max = 256 / (pixel_size * grid);
@@ -207,7 +207,7 @@ void REGISTER_FC_WEIGHT(dreg_t weight_target, const int8_t kernel[][1024], int g
 	scamp5_draw_end();
 }
 
-
+// @@@Finished and current in use
 void CONV_FOLD(areg_t reg, int log2_box_size, int grid)
 {
 	for (int x = 0; x < log2_box_size; x++)
@@ -281,7 +281,7 @@ void CONV_FOLD(areg_t reg, int log2_box_size, int grid)
 	scamp5_kernel_end();
 }
 
-//Use R8,E,F
+//Use R8,E,F @@@Finished and current in use
 void FOLD_CONV_IN_GROUP(areg_t input, dreg_t weight, areg_t target, int group_num, int convolution_size, int stride)
 {
 	int grid = sqrt(group_num);
@@ -320,7 +320,7 @@ void FOLD_CONV_IN_GROUP(areg_t input, dreg_t weight, areg_t target, int group_nu
 
 
 
-//USE R8,R9,R10,F,E
+//USE R8,R9,R10,F,E  @@@ NOT Finished and Snakepath is useful when kernel_size < 4
 void CONV_IN_GROUP_SNAKE_PATH(areg_t input, dreg_t weight, areg_t target, int group_num, int convolution_size)
 {
 	int counter = convolution_size * convolution_size;
@@ -350,7 +350,7 @@ void CONV_IN_GROUP_SNAKE_PATH(areg_t input, dreg_t weight, areg_t target, int gr
 	}
 }
 
-//USE R8
+//USE R8 @@@Finished but not use currently
 void RELU_IN_SCAMP(areg_t target)
 {
 	scamp5_dynamic_kernel_begin();
@@ -364,7 +364,7 @@ void RELU_IN_SCAMP(areg_t target)
 	scamp5_dynamic_kernel_end();
 }
 
-//USE R8,A,E,F
+//USE R8,A,E,F  @@@Finished and current in use
 void MAXPOOLING_SCAMP(areg_t input, int pooling_len, int last_stride, int group)
 {
 	int grid = sqrt(group);
@@ -427,6 +427,7 @@ void MAXPOOLING_SCAMP(areg_t input, int pooling_len, int last_stride, int group)
 	scamp5_dynamic_kernel_end();
 }
 
+//USE R8,R9,F  @@@Finished and current in use
 int FC_SCAMP_SINGLE_OUTPUT(areg_t input, dreg_t weight, int pixel_len, int pooling_len, int grid, int output_neuron_index)
 {
 	int gap = (256 / pixel_len) * pooling_len;
